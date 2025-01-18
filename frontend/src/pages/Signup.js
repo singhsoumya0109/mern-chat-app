@@ -399,12 +399,15 @@ const Signup = ({ toggleForm }) => {
           style={{
             width: "100%",
             padding: "10px",
-            background: "#28A745",
+            background: "#28A745", // Green
             color: "white",
             border: "none",
             borderRadius: "5px",
             cursor: "pointer",
+            transition: "background 0.3s ease",
           }}
+          onMouseEnter={(e) => (e.target.style.background = "#218838")} // Darker green on hover
+          onMouseLeave={(e) => (e.target.style.background = "#28A745")} // Original green
           onClick={submitHandler}
         >
           Sign Up

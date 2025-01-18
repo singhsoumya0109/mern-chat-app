@@ -316,13 +316,16 @@ const Login = ({ toggleForm }) => {
           style={{
             width: "100%",
             padding: "10px",
-            background: "#007BFF",
+            background: "#007BFF", // Blue
             color: "white",
             border: "none",
             borderRadius: "5px",
             cursor: "pointer",
             marginBottom: "4px",
+            transition: "background 0.3s ease",
           }}
+          onMouseEnter={(e) => (e.target.style.background = "#0056b3")} // Darker blue on hover
+          onMouseLeave={(e) => (e.target.style.background = "#007BFF")} // Original blue
         >
           Login
         </button>
@@ -338,7 +341,10 @@ const Login = ({ toggleForm }) => {
             borderRadius: "5px",
             cursor: "pointer",
             marginTop: "4px",
+            transition: "background 0.3s ease",
           }}
+          onMouseEnter={(e) => (e.target.style.background = "#CC0000")} // Darker red on hover
+          onMouseLeave={(e) => (e.target.style.background = "#FF0000")} // Original red
           onClick={guestLogin}
         >
           Guest login
