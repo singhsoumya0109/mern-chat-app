@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const { chats } = require("./data/data");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 
@@ -14,14 +15,16 @@ connectDB();
 
 app.use(express.json());
 app.get('/', (req, res) => {
-    res.send("hello1");
+    res.send("Api is running successfully");
 })
 
-app.get('/chat', (req, res) => {
-    res.send(chats);
-})
+// app.get('/chat', (req, res) => {
+//     res.send(chats);
+// })
 
 app.use('/user', userRoutes);
+
+app.use('/chat', chatRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
