@@ -332,7 +332,7 @@ const Login = ({ toggleForm }) => {
           style={{
             width: "100%",
             padding: "10px",
-            background: "#007BFF",
+            background: "#FF0000",
             color: "white",
             border: "none",
             borderRadius: "5px",
