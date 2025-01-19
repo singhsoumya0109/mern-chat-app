@@ -29,19 +29,79 @@
 
 // export default ChatPage;
 
+// import React from "react";
+// import {ChatState} from "../context/ChatProvider"
+// import Navbar from "./Miscelleneous/Navbar";
+// import MyChats from "./MyChats";
+// import ChatBox from "./ChatBox";
+// function ChatPage() {
+//   const { user } = ChatState();
+//   return (
+//     <div>
+//       {user && <Navbar />}
+//       <div>
+//         {user && <MyChats />}
+//         {user && <ChatBox />}
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ChatPage;
 import React from "react";
-import {ChatState} from "../context/ChatProvider"
+import { ChatState } from "../context/ChatProvider";
 import Navbar from "./Miscelleneous/Navbar";
 import MyChats from "./MyChats";
 import ChatBox from "./ChatBox";
+
 function ChatPage() {
   const { user } = ChatState();
   return (
-    <div>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+      {/* Navbar */}
       {user && <Navbar />}
-      <div>
-        {user && <MyChats />}
-        {user && <ChatBox />}
+
+      {/* Main Content */}
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          marginTop: "10px",
+          padding: "10px",
+          gap: "10px",
+        }}
+      >
+        {/* MyChats Section */}
+        {user && (
+          <div
+            style={{
+              flex: "0 0 30%", // 30% width
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+              overflowY: "auto", // Enable scrolling if content overflows
+              padding: "10px",
+            }}
+          >
+            <MyChats />
+          </div>
+        )}
+
+        {/* ChatBox Section */}
+        {user && (
+          <div
+            style={{
+              flex: "1 1 70%", // 70% width
+              backgroundColor: "#ffffff",
+              borderRadius: "8px",
+              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+              overflowY: "auto", // Enable scrolling if content overflows
+              padding: "10px",
+            }}
+          >
+            <ChatBox />
+          </div>
+        )}
       </div>
     </div>
   );

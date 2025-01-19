@@ -11,7 +11,7 @@ const {
 
 const router = express.Router();
 
-router.route("/").post(protect, accessChat);
+router.route("/").post(protect, accessChat);//to create a chat with a specific user
 router.route("/").get(protect, fetchChats);
 router.route("/group").post(protect, createGroupChat);
 router.route("/rename").put(protect, renameGroup);
