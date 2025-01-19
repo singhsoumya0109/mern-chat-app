@@ -1,55 +1,44 @@
-/* .App
-{
-    min-height: 100vh;
-    display: flex;
-    background-image: url("./2.png");
-    background-size: cover;
-    background-position: center;
-} */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+}
 
 .App {
-    min-height: 100vh; /* Ensures the container covers the entire viewport height */
-    display: flex; /* Enables flexbox for positioning content */
-    /* background-image: url("./background.jpg"); Sets the background image */
-    background-size: cover; /* Ensures the background image covers the whole container */
-    background-position: center center; /* Centers the background image */
-    background-repeat: no-repeat; /* Prevents the background image from repeating */
-    background-attachment: fixed; /* Creates a parallax scrolling effect */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
-/* .heading-home {
-    background-color: white;
-    color: black;
-    display: block;
-    justify-content: center;
-    align-items: center; 
-    position: absolute; 
-    left: 50%;
-    transform: translateX(-50%); 
-    padding-left: 170px;
-    padding-right: 170px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    font-size: 40px;
-    margin: 40px 0px 15px 0px; 
-    border-radius: 15px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
-} */
 
+.content {
+  flex: 1;
+}
 
-.heading-home {
-  background-color: white;
-  color: black;
+.footer {
+  background-color: #090909; /* Dark background */
+  color: #ffffff; /* Light text color */
+  padding: 0.7rem 0;
+  margin-top: auto;
+  z-index: 2;
   text-align: center;
-  
-    padding-right: 170px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    font-size: 40px;
-    margin: 40px 0px 15px 0px; 
-    border-radius: 15px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
-  display: block; /* Ensure block-level display */
 }
 
+.footer .social-icons a {
+  color: #ffffff; /* White color for icons */
+  margin: 0 10px;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
 
+.footer .social-icons a:hover {
+  color: #0073b1; /* LinkedIn color on hover */
+}
 
+.footer .social-icons a.github-icon:hover {
+  color: #333333; /* GitHub icon color on hover */
+}
+
+.footer .social-icons a.portfolio-icon:hover {
+  color: #3498db; /* Blue for portfolio link on hover */
+}

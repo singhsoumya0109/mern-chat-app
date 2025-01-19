@@ -772,7 +772,7 @@ const Navbar = () => {
             };
 
           const { data } = await axios.post("/chat", { userId }, config);
-          if (!chats.find((c) => c._id === data.id)) setChats([data, ...chats]);
+          if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
             setSelectedChat(data);
             setLoadingChat(false);
         }

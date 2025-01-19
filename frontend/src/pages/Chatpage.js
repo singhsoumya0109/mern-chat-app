@@ -53,9 +53,11 @@ import { ChatState } from "../context/ChatProvider";
 import Navbar from "./Miscelleneous/Navbar";
 import MyChats from "./MyChats";
 import ChatBox from "./ChatBox";
+import { useState } from "react";
 
 function ChatPage() {
   const { user } = ChatState();
+  const [fetchAgain, setFetchAgain] = useState(false);
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Navbar */}
@@ -66,9 +68,10 @@ function ChatPage() {
         style={{
           display: "flex",
           flex: 1,
-          marginTop: "10px",
+          marginTop: "0px",
           padding: "10px",
           gap: "10px",
+          height: "90%",
         }}
       >
         {/* MyChats Section */}
@@ -83,7 +86,7 @@ function ChatPage() {
               padding: "10px",
             }}
           >
-            <MyChats />
+            <MyChats fetchAgain={fetchAgain} />
           </div>
         )}
 
@@ -99,7 +102,7 @@ function ChatPage() {
               padding: "10px",
             }}
           >
-            <ChatBox />
+            <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
           </div>
         )}
       </div>

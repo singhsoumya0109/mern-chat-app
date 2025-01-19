@@ -43,7 +43,7 @@ import React, { useState, useEffect } from "react";
 import { ChatState } from "../context/ChatProvider";
 import axios from "axios";
 import { getName } from "../config/ChatLogics";
-const MyChats = () => {
+const MyChats = ({fetchAgain}) => {
   const [loggedUser, setLoggedUser] = useState();
   const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
 
@@ -67,7 +67,7 @@ const MyChats = () => {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
-  }, []);
+  }, [fetchAgain]);
 
   return (
     <div
