@@ -101,13 +101,22 @@ import { getName } from "../config/ChatLogics";
 import FullChat from "./FullChat"
 import axios from "axios";
 import "./style.css";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000";
+var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-
+  const [socketConnected, setSocketConnected] = useState(false);
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connected", () => setSocketConnected(true));
+  }, []);
   // Send Message Function
   const sendMessage = async() => {
     try {
@@ -122,6 +131,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         chatId: selectedChat._id,
       }, config);
 
+      socket.emit("new message", data);
       setMessages([...messages, data]);
         setNewMessage("");
       console.log(data);
@@ -151,7 +161,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       const { data } = await axios.get(`/messages/${selectedChat._id}`, config);
       setMessages(data);
       setLoading(false);
-      console.log(data);
+      socket.emit('join chat', selectedChat._id);
+      //console.log(data);
+      setFetchAgain((prev) => !prev); // Trigger re-fetch in MyChats
     }
     catch (error) {
       console.error("Error during fetching messages:", error);
@@ -163,9 +175,25 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     fetchMessages();
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
+  
 
+
+useEffect(() => {
+  socket.on("message recieved", (newMessageRecieved) => {
+    if (
+      !selectedChatCompare ||
+      selectedChatCompare._id !== newMessageRecieved.chat._id
+    ) {
+      //notify
+    } else {
+      setMessages([...messages, newMessageRecieved]);
+    }
+  });
+});
+  
 
   // Handle Enter Key Press
   const typingHandler = (e) => {
