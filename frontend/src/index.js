@@ -6,11 +6,12 @@ import { BrowserRouter } from "react-router-dom"
 import ChatProvider from './context/ChatProvider';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <ChatProvider>
-    <BrowserRouter>
+  
+  <BrowserRouter>
+    <ChatProvider>
       <App />
+      </ChatProvider>
     </BrowserRouter>
-  </ChatProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

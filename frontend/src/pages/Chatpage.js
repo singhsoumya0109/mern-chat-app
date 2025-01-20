@@ -69,7 +69,7 @@ function ChatPage() {
           display: "flex",
           flex: 1,
           marginTop: "0px",
-          padding: "10px",
+          padding: "0px",
           gap: "10px",
           height: "90%",
         }}
@@ -83,7 +83,7 @@ function ChatPage() {
               borderRadius: "8px",
               boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
               overflowY: "auto", // Enable scrolling if content overflows
-              padding: "10px",
+              padding: "0px",
             }}
           >
             <MyChats fetchAgain={fetchAgain} />
@@ -99,7 +99,7 @@ function ChatPage() {
               borderRadius: "8px",
               boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
               overflowY: "auto", // Enable scrolling if content overflows
-              padding: "10px",
+              padding: "3px",
             }}
           >
             <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
