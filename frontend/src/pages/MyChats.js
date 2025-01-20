@@ -49,7 +49,7 @@ const MyChats = ({fetchAgain}) => {
               key={chat._id}
               onClick={() => setSelectedChat(chat)}
               style={{
-                padding: "10px",
+                padding: "20px",
                 borderRadius: "6px",
                 backgroundColor:
                   selectedChat?._id === chat._id ? "#98fb98" : "#ffffff",
@@ -63,11 +63,11 @@ const MyChats = ({fetchAgain}) => {
               <strong>
                 {chat.isGroup ? chat.chatName : getName(loggedUser, chat.users)}
               </strong>
-              <span style={{ fontSize: "12px", color: "#777" }}>
+              {/* <span style={{ fontSize: "12px", color: "#777" }}>
                 {chat.latestMessage
                   ? `${chat.latestMessage.sender.name}: ${chat.latestMessage.content}`
                   : "No messages yet"}
-              </span>
+              </span> */}
             </div>
           ))}
         </div>
