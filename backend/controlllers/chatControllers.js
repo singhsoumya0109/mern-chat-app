@@ -133,126 +133,119 @@ const renameGroup = asyncHandler(async (req, res) => {
 });
 
 
-// const addToGroup = asyncHandler(async (req, res) => {
-//     const { chatId, userId } = req.body.user;
-//     const added = Chat.findByIdAndUpdate(
-//         chatId,
-//         {
-//             $push: {
-//                 users: userId
-//             },
-//         },
-//         {
-//             new: true
-//         }
-//     )
-//         .populate("users", "-password")
-//         .populate("groupAdmin", "-password");
-    
-//     if (!added)
-//     {
-//         res.status(404);
-//         throw new Error("Chat not found");
-//     }
-//     else
-//     {
-//         res.json(added);
-//     }
-// });
-
-// const removeFromGroup = asyncHandler(async (req, res) => {
-//      const { chatId, userId } = req.body.user;
-//      const removed = Chat.findByIdAndUpdate(
-//        chatId,
-//        {
-//          $pull: {
-//            users: userId,
-//          },
-//        },
-//        {
-//          new: true,
-//        }
-//      )
-//        .populate("users", "-password")
-//        .populate("groupAdmin", "-password");
-
-//      if (!removed) {
-//        res.status(404);
-//        throw new Error("Chat not found");
-//      } else {
-//        res.json(removed);
-//      }
-
-// });
 
 
 const addToGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
-  // Find the chat to check if it is a group chat
+  // Find the chat to validate if it exists and check admin privileges
   const chat = await Chat.findById(chatId);
 
   if (!chat) {
-    res.status(404);
-    throw new Error("Chat not found");
+    return res.status(404).json({ message: "Chat not found" });
   }
 
   if (!chat.isGroup) {
-    res.status(400);
-    throw new Error("Cannot add users to a non-group chat");
+    return res
+      .status(400)
+      .json({ message: "Cannot add users to a non-group chat" });
   }
 
-  // Add the user to the group
-  const added = await Chat.findByIdAndUpdate(
-    chatId,
-    {
-      $push: { users: userId },
-    },
-    { new: true }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password");
+  // Check if the requester is the group admin
+  if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+    return res
+      .status(403)
+      .json({ message: "Only the group admin can add users to the group" });
+  }
 
-  if (!added) {
-    res.status(404);
-    throw new Error("Failed to add user to the group");
-  } else {
-    res.json(added);
+  // Check if the user is already in the group
+  if (chat.users.includes(userId)) {
+    return res.status(400).json({ message: "User is already in the group" });
+  }
+
+  try {
+    // Add the user to the group
+    const added = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $push: { users: userId },
+      },
+      { new: true }
+    )
+      .populate("users", "-password") // Populate user details, excluding the password
+      .populate("groupAdmin", "-password"); // Populate group admin details, excluding the password
+
+    if (!added) {
+      return res
+        .status(500)
+        .json({
+          message: "Failed to add user to the group due to an unknown error",
+        });
+    }
+
+    res.status(200).json(added); // Return the updated chat object
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 });
+
+
+
+
+  
+
 
 const removeFromGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
-  // Find the chat to check if it is a group chat
+  // Find the chat to validate if it exists and check admin privileges
   const chat = await Chat.findById(chatId);
 
   if (!chat) {
-    res.status(404);
-    throw new Error("Chat not found");
+    return res.status(404).json({ message: "Chat not found" });
   }
 
   if (!chat.isGroup) {
-    res.status(400);
-    throw new Error("Cannot remove users from a non-group chat");
+    return res
+      .status(400)
+      .json({ message: "Cannot remove users from a non-group chat" });
   }
 
-  // Remove the user from the group
-  const removed = await Chat.findByIdAndUpdate(
-    chatId,
-    {
-      $pull: { users: userId },
-    },
-    { new: true }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password");
+  // Check if the requester is the group admin
+  if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+    return res
+      .status(403)
+      .json({
+        message: "Only the group admin can remove users from the group",
+      });
+  }
 
-  if (!removed) {
-    res.status(404);
-    throw new Error("Failed to remove user from the group");
-  } else {
-    res.json(removed);
+  // Check if the user is in the group
+  if (!chat.users.includes(userId)) {
+    return res.status(400).json({ message: "User is not in the group" });
+  }
+
+  try {
+    // Remove the user from the group
+    const removed = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $pull: { users: userId },
+      },
+      { new: true }
+    )
+      .populate("users", "-password") // Populate user details, excluding the password
+      .populate("groupAdmin", "-password"); // Populate group admin details, excluding the password
+
+    if (!removed) {
+      return res.status(500).json({
+        message: "Failed to remove user from the group due to an unknown error",
+      });
+    }
+
+    res.status(200).json(removed); // Return the updated chat object
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 });
 
@@ -260,7 +253,3 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 module.exports = { accessChat, fetchChats, createGroupChat, renameGroup ,addToGroup,
     removeFromGroup,
 };
-
-  
-
-

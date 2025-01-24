@@ -70,7 +70,7 @@ const server = app.listen(PORT, console.log(`Server running at ${PORT}`));
 const io = require('socket.io')(server, {
     pingTimeout:60000,
     cors: {
-        origin: "*",
+        origin: "http://localhost:3000",
     },
 });
 
