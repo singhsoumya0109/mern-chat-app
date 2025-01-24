@@ -286,52 +286,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                       </button>
                     </div>
 
-                    {/* List Group Members */}
-                    <div style={{ marginBottom: "10px" }}>
-                      <h4 style={{ margin: "0 0 10px" }}>Group Members:</h4>
-                      {selectedChat.users
-                        .sort((a, b) =>
-                          a._id === user._id ? -1 : b._id === user._id ? 1 : 0
-                        ) // Sort: current user at top
-                        .map((member) => (
-                          <div
-                            key={member._id}
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              padding: "5px 0",
-                              borderBottom: "1px solid #ddd",
-                            }}
-                          >
-                            <span>
-                              {member.name}{" "}
-                              {member._id === selectedChat.groupAdmin._id &&
-                                "(Admin)"}
-                              {member._id === user._id && " (You)"}
-                            </span>
-                            {selectedChat.groupAdmin._id === user._id &&
-                              member._id !== user._id && (
-                                <button
-                                  onClick={() =>
-                                    removeUserFromGroup(member._id)
-                                  }
-                                  style={{
-                                    padding: "5px 10px",
-                                    backgroundColor: "#dc3545",
-                                    color: "#fff",
-                                    border: "none",
-                                    borderRadius: "5px",
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Remove
-                                </button>
-                              )}
-                          </div>
-                        ))}
-                    </div>
-
                     {/* Add Users Section */}
                     <div>
                       <input
@@ -378,6 +332,52 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                           </div>
                         ))
                       )}
+                    </div>
+
+                    {/* List Group Members */}
+                    <div style={{ marginBottom: "10px" }}>
+                      <h4 style={{ margin: "0 0 10px" }}>Group Members:</h4>
+                      {selectedChat.users
+                        .sort((a, b) =>
+                          a._id === user._id ? -1 : b._id === user._id ? 1 : 0
+                        ) // Sort: current user at top
+                        .map((member) => (
+                          <div
+                            key={member._id}
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              padding: "5px 0",
+                              borderBottom: "1px solid #ddd",
+                            }}
+                          >
+                            <span>
+                              {member.name}{" "}
+                              {member._id === selectedChat.groupAdmin._id &&
+                                "(Admin)"}
+                              {member._id === user._id && " (You)"}
+                            </span>
+                            {selectedChat.groupAdmin._id === user._id &&
+                              member._id !== user._id && (
+                                <button
+                                  onClick={() =>
+                                    removeUserFromGroup(member._id)
+                                  }
+                                  style={{
+                                    padding: "5px 10px",
+                                    backgroundColor: "#dc3545",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Remove
+                                </button>
+                              )}
+                          </div>
+                        ))}
                     </div>
                   </div>
                 )}
