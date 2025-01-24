@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { ChatState } from "../context/ChatProvider";
-import { getName } from "../config/ChatLogics";
 import FullChat from "./FullChat";
+import ChatHeader from "./ChatHeader";
+import ChatInput from "./ChatInput";
+import GroupChatOptions from "./GroupChatOptions";
 import axios from "axios";
 import io from "socket.io-client";
 import debounce from "lodash.debounce";
@@ -99,7 +101,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
-  // Perform search functionality
   const performSearch = async (query) => {
     if (!query) {
       setSearchResult([]);
@@ -121,13 +122,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     setLoadingSearch(false);
   };
 
-  // Debounced search function
   const debouncedSearch = useCallback(
     debounce((query) => performSearch(query), 500),
     []
   );
 
-  // Handle search input
   const handleInputChange = (e) => {
     const query = e.target.value;
     setSearch(query);
@@ -149,14 +148,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       );
       alert("User added successfully!");
       setFetchAgain((prev) => !prev);
-      setSearch(""); // Reset search input
-      setSearchResult([]); // Clear search results
+      setSearch("");
+      setSearchResult([]);
     } catch (error) {
       console.error("Error adding user to group:", error);
       alert("Failed to add user to the group.");
     }
   };
-
 
   const removeUserFromGroup = async (userId) => {
     try {
@@ -216,174 +214,29 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     >
       {selectedChat ? (
         <>
-          <div
-            style={{
-              padding: "10px",
-              borderBottom: "1px solid #ccc",
-              backgroundColor: "#f5f5f5",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <h1 style={{ margin: 0 }}>
-              {selectedChat.isGroup
-                ? selectedChat.chatName
-                : getName(user, selectedChat.users)}
-            </h1>
-            {selectedChat.isGroup && (
-              <div>
-                <button
-                  style={{
-                    padding: "5px 10px",
-                    backgroundColor: "#007bff",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setShowOptions(!showOptions)}
-                >
-                  Options
-                </button>
-                {showOptions && (
-                  <div
-                    style={{
-                      marginTop: "10px",
-                      background: "#f1f1f1",
-                      padding: "10px",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    {/* Rename Group Section */}
-                    <div style={{ marginBottom: "10px" }}>
-                      <input
-                        type="text"
-                        placeholder="Rename group"
-                        value={newGroupName}
-                        onChange={(e) => setNewGroupName(e.target.value)}
-                        style={{
-                          padding: "5px",
-                          margin: "5px 0",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                        }}
-                      />
-                      <button
-                        onClick={renameGroup}
-                        style={{
-                          padding: "5px 10px",
-                          backgroundColor: "#007bff",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: "5px",
-                          cursor: "pointer",
-                          marginTop: "5px",
-                        }}
-                      >
-                        Rename
-                      </button>
-                    </div>
+          <ChatHeader
+            selectedChat={selectedChat}
+            user={user}
+            showOptions={showOptions}
+            setShowOptions={setShowOptions}
+          />
 
-                    {/* Add Users Section */}
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="Search users to add"
-                        value={search}
-                        onChange={handleInputChange}
-                        style={{
-                          padding: "5px",
-                          margin: "5px 0",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                          width: "100%",
-                        }}
-                      />
-                      {loadingSearch ? (
-                        <p>Searching...</p>
-                      ) : (
-                        searchResult.map((result) => (
-                          <div
-                            key={result._id}
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              padding: "5px 0",
-                              borderBottom: "1px solid #ddd",
-                            }}
-                          >
-                            <span>{result.name}</span>
-                            <button
-                              onClick={() => addUserToGroup(result._id)}
-                              style={{
-                                padding: "5px 10px",
-                                backgroundColor: "#007bff",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                              }}
-                            >
-                              Add
-                            </button>
-                          </div>
-                        ))
-                      )}
-                    </div>
+          {showOptions && selectedChat.isGroup && (
+            <GroupChatOptions
+              selectedChat={selectedChat}
+              user={user}
+              newGroupName={newGroupName}
+              setNewGroupName={setNewGroupName}
+              renameGroup={renameGroup}
+              search={search}
+              handleInputChange={handleInputChange}
+              searchResult={searchResult}
+              loadingSearch={loadingSearch}
+              addUserToGroup={addUserToGroup}
+              removeUserFromGroup={removeUserFromGroup}
+            />
+          )}
 
-                    {/* List Group Members */}
-                    <div style={{ marginBottom: "10px" }}>
-                      <h4 style={{ margin: "0 0 10px" }}>Group Members:</h4>
-                      {selectedChat.users
-                        .sort((a, b) =>
-                          a._id === user._id ? -1 : b._id === user._id ? 1 : 0
-                        ) // Sort: current user at top
-                        .map((member) => (
-                          <div
-                            key={member._id}
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              padding: "5px 0",
-                              borderBottom: "1px solid #ddd",
-                            }}
-                          >
-                            <span>
-                              {member.name}{" "}
-                              {member._id === selectedChat.groupAdmin._id &&
-                                "(Admin)"}
-                              {member._id === user._id && " (You)"}
-                            </span>
-                            {selectedChat.groupAdmin._id === user._id &&
-                              member._id !== user._id && (
-                                <button
-                                  onClick={() =>
-                                    removeUserFromGroup(member._id)
-                                  }
-                                  style={{
-                                    padding: "5px 10px",
-                                    backgroundColor: "#dc3545",
-                                    color: "#fff",
-                                    border: "none",
-                                    borderRadius: "5px",
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Remove
-                                </button>
-                              )}
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
           <div
             style={{
               flex: 1,
@@ -400,49 +253,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               </div>
             )}
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "10px",
-              borderTop: "1px solid #ccc",
-              backgroundColor: "#f5f5f5",
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Enter a message..."
-              value={newMessage}
-              onChange={typingHandler}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && newMessage) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              }}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "20px",
-                border: "1px solid #ccc",
-                outline: "none",
-                marginRight: "10px",
-              }}
-            />
-            <button
-              onClick={sendMessage}
-              style={{
-                padding: "10px 15px",
-                backgroundColor: "#007bff",
-                color: "#fff",
-                border: "none",
-                borderRadius: "20px",
-                cursor: "pointer",
-              }}
-            >
-              Send
-            </button>
-          </div>
+
+          <ChatInput
+            newMessage={newMessage}
+            typingHandler={typingHandler}
+            sendMessage={sendMessage}
+          />
         </>
       ) : (
         <div
@@ -461,4 +277,3 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 };
 
 export default SingleChat;
-
