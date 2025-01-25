@@ -248,7 +248,7 @@ const MyChats = ({ fetchAgain }) => {
               padding: "10px",
               borderRadius: "4px",
               border: "1px solid #ccc",
-              width: "100%",
+              width: "95%",
             }}
           />
 
@@ -261,7 +261,7 @@ const MyChats = ({ fetchAgain }) => {
               padding: "10px",
               borderRadius: "4px",
               border: "1px solid #ccc",
-              width: "100%",
+              width: "95%",
             }}
           />
 

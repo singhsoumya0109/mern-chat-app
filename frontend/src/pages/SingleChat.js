@@ -179,6 +179,27 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+  const exitFromGroup = async () => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      await axios.post("/chat/groupexit", { chatId: selectedChat._id }, config);
+
+      alert("You have exited the group!");
+      setSelectedChat(null);
+      setFetchAgain((prev) => !prev);
+    } catch (error) {
+      console.error("Error exiting the group:", error);
+      alert("Failed to exit the group.");
+    }
+  };
+
+
   useEffect(() => {
     fetchMessages();
     selectedChatCompare = selectedChat;
@@ -234,6 +255,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               loadingSearch={loadingSearch}
               addUserToGroup={addUserToGroup}
               removeUserFromGroup={removeUserFromGroup}
+              exitFromGroup={exitFromGroup} // Pass the function
             />
           )}
 

@@ -250,8 +250,141 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 });
 
 
+// const exitFromGroup = asyncHandler(async (req, res) => {
+//   const { chatId} = req.body;
+//   const userId=req.user._id;
+
+//   const chat = await Chat.findById(chatId);
+
+//   if (!chat) {
+//     return res.status(404).json({ message: "Chat not found" });
+//   }
+
+//   if (!chat.users.includes(userId)) {
+//     return res.status(400).json({ message: "User is not in the group" });
+//   }
+
+//   try {
+//     // Check if the user leaving is the current groupAdmin
+//     const isAdminExiting = chat.groupAdmin.toString() === userId;
+
+//     // Remove the user from the group
+//     const updatedChat = await Chat.findByIdAndUpdate(
+//       chatId,
+//       {
+//         $pull: { users: userId },
+//       },
+//       { new: true }
+//     )
+//       .populate("users", "-password") // Populate user details, excluding the password
+//       .populate("groupAdmin", "-password"); // Populate group admin details, excluding the password
+
+//     if (!updatedChat) {
+//       return res.status(500).json({
+//         message: "Failed to remove user from the group due to an unknown error",
+//       });
+//     }
+
+//     // If the admin exits, assign the next admin as users[1] (if it exists)
+//     if (isAdminExiting && updatedChat.users.length >= 0) {
+//       updatedChat.groupAdmin = updatedChat.users[0]._id;
+//       await updatedChat.save();
+//     }
+
+//     // Delete all messages from this user in the specified chat
+//     const deletedMessages = await Message.deleteMany({
+//       sender: userId,
+//       chat: chatId,
+//     });
+
+//     if (!deletedMessages) {
+//       return res.status(500).json({
+//         message: "Failed to delete user messages due to an unknown error",
+//       });
+//     }
+
+//     // Optionally log how many messages were deleted
+//     // console.log(
+//     //   `${deletedMessages.deletedCount} messages deleted for user ${userId} in chat ${chatId}`
+//     // );
+
+//     res.status(200).json({
+//       message:
+//         "User removed from the group, messages deleted, and admin updated (if needed)",
+//       updatedChat,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message || "Internal Server Error" });
+//   }
+// });
+
+// const exitFromGroup = asyncHandler(async (req, res) => {
+//   const { chatId } = req.body;
+//   const userId = req.user._id;
+
+//   const chat = await Chat.findById(chatId);
+
+//   if (!chat) {
+//     return res.status(404).json({ message: "Chat not found" });
+//   }
+
+//   if (!chat.users.includes(userId)) {
+//     return res.status(400).json({ message: "User is not in the group" });
+//   }
+
+//   try {
+//     // Check if the user leaving is the current groupAdmin
+//     const isAdminExiting = chat.groupAdmin.toString() === userId;
+
+//     // Remove the user from the group
+//     const updatedChat = await Chat.findByIdAndUpdate(
+//       chatId,
+//       {
+//         $pull: { users: userId },
+//       },
+//       { new: true }
+//     )
+//       .populate("users", "-password") // Populate user details, excluding the password
+//       .populate("groupAdmin", "-password"); // Populate group admin details, excluding the password
+
+//     if (!updatedChat) {
+//       return res.status(500).json({
+//         message: "Failed to remove user from the group due to an unknown error",
+//       });
+//     }
+
+//     // If the admin exits, assign the next admin as users[0] (if it exists)
+//     if (isAdminExiting && updatedChat.users.length >= 0) {
+//       console.log("Admin exiting");
+//        updatedChat.groupAdmin = updatedChat.users[0]._id;
+//        await updatedChat.save();
+//      }
+
+//     // Delete all messages from this user in the specified chat
+//     const deletedMessages = await Message.deleteMany({
+//       sender: userId,
+//       chat: chatId,
+//     });
+
+//     if (!deletedMessages) {
+//       return res.status(500).json({
+//         message: "Failed to delete user messages due to an unknown error",
+//       });
+//     }
+
+//     res.status(200).json({
+//       message:
+//         "User removed from the group, messages deleted, and admin updated (if needed)",
+//       updatedChat,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message || "Internal Server Error" });
+//   }
+// });
+
 const exitFromGroup = asyncHandler(async (req, res) => {
-  const { chatId, userId } = req.body;
+  const { chatId } = req.body;
+  const userId = req.user._id;
 
   const chat = await Chat.findById(chatId);
 
@@ -264,8 +397,8 @@ const exitFromGroup = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Check if the user leaving is the current groupAdmin
-    const isAdminExiting = chat.groupAdmin.toString() === userId;
+    const isAdminExiting = chat.groupAdmin?.toString() === userId.toString();
+    //console.log("Admin exiting:", isAdminExiting); // Debug log
 
     // Remove the user from the group
     const updatedChat = await Chat.findByIdAndUpdate(
@@ -275,8 +408,8 @@ const exitFromGroup = asyncHandler(async (req, res) => {
       },
       { new: true }
     )
-      .populate("users", "-password") // Populate user details, excluding the password
-      .populate("groupAdmin", "-password"); // Populate group admin details, excluding the password
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password");
 
     if (!updatedChat) {
       return res.status(500).json({
@@ -284,13 +417,12 @@ const exitFromGroup = asyncHandler(async (req, res) => {
       });
     }
 
-    // If the admin exits, assign the next admin as users[1] (if it exists)
-    if (isAdminExiting && updatedChat.users.length >= 0) {
+    if (isAdminExiting && updatedChat.users.length > 0) {
       updatedChat.groupAdmin = updatedChat.users[0]._id;
       await updatedChat.save();
+      //console.log("New admin set:", updatedChat.groupAdmin);
     }
 
-    // Delete all messages from this user in the specified chat
     const deletedMessages = await Message.deleteMany({
       sender: userId,
       chat: chatId,
@@ -302,17 +434,13 @@ const exitFromGroup = asyncHandler(async (req, res) => {
       });
     }
 
-    // Optionally log how many messages were deleted
-    // console.log(
-    //   `${deletedMessages.deletedCount} messages deleted for user ${userId} in chat ${chatId}`
-    // );
-
     res.status(200).json({
       message:
         "User removed from the group, messages deleted, and admin updated (if needed)",
       updatedChat,
     });
   } catch (error) {
+    console.error("Error:", error); // Debug log
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 });
