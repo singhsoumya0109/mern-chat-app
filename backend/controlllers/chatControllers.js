@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
+const Message = require("../models/messageModel");
 
 const accessChat = asyncHandler(async (req, res) => {
     const { userId } = req.body;
@@ -73,40 +74,39 @@ const fetchChats = asyncHandler(async (req, res) => {
 
 
 const createGroupChat = asyncHandler(async (req, res) => {
-    if (!req.body.users || !req.body.name) {
-        return res.status(400).send(
-            { message: "All details aren't filled" }
-        );
-    }
-    
-    var users = JSON.parse(req.body.users);
-    if (users.length < 2) {
-        return res
-            .status(400)
-            .send("Add more users");
-    }
-    users.push(req.user);
-    try {
-        const groupChat = await Chat.create({
-            chatName: req.body.name,
-            users,
-            isGroup: true,
-            groupAdmin: req.user,
-        });
+  if (!req.body.users || !req.body.name) {
+    return res.status(400).send({
+      message: "All details aren't filled",
+    });
+  }
 
+  var users = JSON.parse(req.body.users);
+  if (users.length < 2) {
+    return res.status(400).send("Add more users");
+  }
 
-        const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
-            .populate("users", "-password")
-            .populate("groupAdmin", "-password");
-        res.status(200).json(fullGroupChat);
-    }
-    catch (error)
-    {
-        res.status(400);
-        throw new Error(error.message);
-    }
-    
+  // Add req.user to the front of the users array
+  users.unshift(req.user);
+
+  try {
+    const groupChat = await Chat.create({
+      chatName: req.body.name,
+      users,
+      isGroup: true,
+      groupAdmin: req.user,
+    });
+
+    const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password");
+
+    res.status(200).json(fullGroupChat);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
 });
+
 
 
 const renameGroup = asyncHandler(async (req, res) => {
@@ -250,6 +250,80 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 });
 
 
-module.exports = { accessChat, fetchChats, createGroupChat, renameGroup ,addToGroup,
-    removeFromGroup,
+const exitFromGroup = asyncHandler(async (req, res) => {
+  const { chatId, userId } = req.body;
+
+  const chat = await Chat.findById(chatId);
+
+  if (!chat) {
+    return res.status(404).json({ message: "Chat not found" });
+  }
+
+  if (!chat.users.includes(userId)) {
+    return res.status(400).json({ message: "User is not in the group" });
+  }
+
+  try {
+    // Check if the user leaving is the current groupAdmin
+    const isAdminExiting = chat.groupAdmin.toString() === userId;
+
+    // Remove the user from the group
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $pull: { users: userId },
+      },
+      { new: true }
+    )
+      .populate("users", "-password") // Populate user details, excluding the password
+      .populate("groupAdmin", "-password"); // Populate group admin details, excluding the password
+
+    if (!updatedChat) {
+      return res.status(500).json({
+        message: "Failed to remove user from the group due to an unknown error",
+      });
+    }
+
+    // If the admin exits, assign the next admin as users[1] (if it exists)
+    if (isAdminExiting && updatedChat.users.length >= 0) {
+      updatedChat.groupAdmin = updatedChat.users[0]._id;
+      await updatedChat.save();
+    }
+
+    // Delete all messages from this user in the specified chat
+    const deletedMessages = await Message.deleteMany({
+      sender: userId,
+      chat: chatId,
+    });
+
+    if (!deletedMessages) {
+      return res.status(500).json({
+        message: "Failed to delete user messages due to an unknown error",
+      });
+    }
+
+    // Optionally log how many messages were deleted
+    // console.log(
+    //   `${deletedMessages.deletedCount} messages deleted for user ${userId} in chat ${chatId}`
+    // );
+
+    res.status(200).json({
+      message:
+        "User removed from the group, messages deleted, and admin updated (if needed)",
+      updatedChat,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
+});
+
+
+module.exports = {
+  accessChat,
+  fetchChats,
+  createGroupChat,
+  renameGroup,
+  addToGroup,
+  removeFromGroup,
+  exitFromGroup,
 };

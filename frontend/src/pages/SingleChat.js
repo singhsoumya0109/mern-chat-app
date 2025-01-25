@@ -249,7 +249,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               <p>Loading chats...</p>
             ) : (
               <div className="messages">
-                <FullChat messages={messages} />
+                <FullChat
+                  messages={messages}
+                  isGroupChat={selectedChat.isGroup}
+                />
               </div>
             )}
           </div>
