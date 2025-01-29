@@ -10,7 +10,7 @@ root.render(
   <BrowserRouter>
     <ChatProvider>
       <App />
-      </ChatProvider>
+    </ChatProvider>
     </BrowserRouter>
 );
 

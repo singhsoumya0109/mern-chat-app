@@ -33,7 +33,7 @@ function NotLoggedInPage() {
           login page.
         </p>
         <a
-          href="http://localhost:3000"
+          href="https://chatting-app-m9df.onrender.com/"
           style={{
             display: "inline-block",
             padding: "10px 20px",
