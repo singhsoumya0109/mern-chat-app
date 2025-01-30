@@ -4,7 +4,7 @@ A real-time chat application built using the **MERN** stack, allowing users to c
 
 ## 🚀 Live Demo
 
-Check out the live app here: [MERN Chat App](https://chatting-app-m9df.onrender.com/chats)
+Check out the live app here: [MERN Chat App](https://chatting-app-m9df.onrender.com)
 
 ---
 
